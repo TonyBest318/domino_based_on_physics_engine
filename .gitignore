@@ -456,3 +456,5 @@ FodyWeavers.xsd
 *.vsix
 
 build/
+
+bullet3/
