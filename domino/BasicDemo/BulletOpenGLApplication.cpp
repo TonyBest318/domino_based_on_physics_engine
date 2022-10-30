@@ -1,8 +1,13 @@
-//
-// Created by AICDG on 2017/8/9.
-//
-
 #include "BulletOpenGLApplication.h"
+#include "btBulletDynamicsCommon.h"
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btAlignedObjectArray.h"
+#include "../Utils/b3ResourcePath.h"
+#include "Bullet3Common/b3FileUtils.h"
+#include "../Importers/ImportObjDemo/LoadMeshFromObj.h"
+#include "../OpenGLWindow/GLInstanceGraphicsShape.h"
+#include "../Utils/b3BulletDefaultFileIO.h"
+#include "../CommonInterfaces/CommonRigidBodyBase.h"
 #include <iostream>
 
 // Some constants for 3D math and the camera speed
@@ -128,7 +133,7 @@ void BulletOpenGLApplication::Idle() {
 	// reset the clock to 0
 	m_clock.reset();
 	// update the scene (convert ms to s)
-	UpdateScene(dt / 1000.0f);
+	UpdateScene(dt / 100.0f);
 
 	// update the camera
 	UpdateCamera();
@@ -138,6 +143,7 @@ void BulletOpenGLApplication::Idle() {
 	
 	// swap the front and back buffers
 	glutSwapBuffers();
+
 }
 
 void BulletOpenGLApplication::Mouse(int button, int state, int x, int y) {}
@@ -283,6 +289,43 @@ void BulletOpenGLApplication::DrawBox(const btVector3 &halfSize) {
 	glEnd();
 }
 
+
+void BulletOpenGLApplication::DrawObj(GLInstanceGraphicsShape* glmesh) {
+	// start processing vertices as triangles
+	glBegin(GL_TRIANGLES);
+
+	// increment the loop by 3 each time since we create a
+	// triangle with 3 vertices at a time.
+
+	for (int i = 0; i < glmesh->m_numIndices; i += 3) {
+		const btVector3& vert1 = btVector3(glmesh->m_vertices->at(glmesh->m_indices->at(i)).xyzw[0] * glmesh->m_scaling[0],
+			glmesh->m_vertices->at(glmesh->m_indices->at(i)).xyzw[1] * glmesh->m_scaling[0],
+			glmesh->m_vertices->at(glmesh->m_indices->at(i)).xyzw[2] * glmesh->m_scaling[0]);
+		const btVector3& vert2 = btVector3(glmesh->m_vertices->at(glmesh->m_indices->at(i + 1)).xyzw[0] * glmesh->m_scaling[1],
+			glmesh->m_vertices->at(glmesh->m_indices->at(i + 1)).xyzw[1] * glmesh->m_scaling[1],
+			glmesh->m_vertices->at(glmesh->m_indices->at(i + 1)).xyzw[2] * glmesh->m_scaling[1]);
+		const btVector3& vert3 = btVector3(glmesh->m_vertices->at(glmesh->m_indices->at(i + 2)).xyzw[0] * glmesh->m_scaling[2],
+			glmesh->m_vertices->at(glmesh->m_indices->at(i + 2)).xyzw[1] * glmesh->m_scaling[2],
+			glmesh->m_vertices->at(glmesh->m_indices->at(i + 2)).xyzw[2] * glmesh->m_scaling[2]);
+
+		// create a normal that is perpendicular to the
+		// face (use the cross product)
+		btVector3 normal = (vert3 - vert1).cross(vert2 - vert1);
+		normal.normalize();
+
+		// set the normal for the subsequent vertices
+		glNormal3f(normal.getX(), normal.getY(), normal.getZ());
+
+		// create the vertices
+		glVertex3f(vert1.x(), vert1.y(), vert1.z());
+		glVertex3f(vert2.x(), vert2.y(), vert2.z());
+		glVertex3f(vert3.x(), vert3.y(), vert3.z());
+	}
+
+	// stop processing vertices
+	glEnd();
+}
+
 void BulletOpenGLApplication::RotateCamera(float &angle, float value) {
 	// change the value (it is passed by reference, so we
 	// can edit it here)
@@ -316,7 +359,7 @@ void BulletOpenGLApplication::RenderScene() {
 		pObj->GetTransform(transform);
 
 		// get data from the object and draw it
-		DrawShape(transform, pObj->GetShape(), pObj->GetColor());
+		DrawShape(transform, pObj->GetShape(), pObj->GetColor(),pObj->GetObjShape());
 	}
 }
 
@@ -330,7 +373,7 @@ void BulletOpenGLApplication::UpdateScene(float dt) {
 	}
 }
 
-void BulletOpenGLApplication::DrawShape(btScalar* transform, const btCollisionShape* pShape, const btVector3 &color) {
+void BulletOpenGLApplication::DrawShape(btScalar* transform, const btCollisionShape* pShape, const btVector3 &color, GLInstanceGraphicsShape* glmesh) {
 	// set the color
 	glColor3f(color.x(), color.y(), color.z());
 
@@ -351,6 +394,12 @@ void BulletOpenGLApplication::DrawShape(btScalar* transform, const btCollisionSh
 		DrawBox(halfSize);
 		break;
 	}
+	case CONVEX_HULL_SHAPE_PROXYTYPE:
+	{
+		// draw the obj
+		DrawObj(glmesh);
+		break;
+	}
 	default:
 		// unsupported type
 		break;
@@ -360,9 +409,9 @@ void BulletOpenGLApplication::DrawShape(btScalar* transform, const btCollisionSh
 	glPopMatrix();
 }
 
-GameObject* BulletOpenGLApplication::CreateGameObject(btCollisionShape* pShape, const float &mass, const btVector3 &color, const btVector3 &initialPosition, const btQuaternion &initialRotation) {
+GameObject* BulletOpenGLApplication::CreateGameObject(btCollisionShape* pShape, const float &mass, const btVector3 &color, const btVector3 &initialPosition, const btQuaternion &initialRotation, GLInstanceGraphicsShape* glmesh) {
 	// create a new game object
-	GameObject* pObject = new GameObject(pShape, mass, color, initialPosition, initialRotation);
+	GameObject* pObject = new GameObject(pShape, mass, color, initialPosition, initialRotation, glmesh);
 
 	// push it to the back of the list
 	m_objects.push_back(pObject);
@@ -373,4 +422,28 @@ GameObject* BulletOpenGLApplication::CreateGameObject(btCollisionShape* pShape, 
 		m_pWorld->addRigidBody(pObject->GetRigidBody());
 	}
 	return pObject;
+}
+
+GameObject* BulletOpenGLApplication::CreateGameObjectWithObj(const char* fileName, float scaling[4], const float& mass, const btVector3& color, const btVector3& initialPosition, const btQuaternion& initialRotation) {
+	// read obj
+	char relativeFileName[1024];
+	if (b3ResourcePath::findResourcePath(fileName, relativeFileName, 1024, 0))
+	{
+		char pathPrefix[1024];
+		b3FileUtils::extractPath(relativeFileName, pathPrefix, 1024);
+	}
+	b3BulletDefaultFileIO fileIO;
+	GLInstanceGraphicsShape* glmesh = LoadMeshFromObj(relativeFileName, "", &fileIO);
+	printf("[INFO] Obj loaded: Extracted %d verticed from obj file [%s]\n", glmesh->m_numvertices, fileName);
+
+	// generate collision shape
+	const GLInstanceVertex& v = glmesh->m_vertices->at(0);
+	btConvexHullShape* shape = new btConvexHullShape((const btScalar*)(&(v.xyzw[0])), glmesh->m_numvertices, sizeof(GLInstanceVertex));
+
+	// set scaling
+	glmesh->m_scaling[0] = scaling[0];	glmesh->m_scaling[1] = scaling[1];	glmesh->m_scaling[2] = scaling[2];	glmesh->m_scaling[3] = scaling[3];
+	btVector3 localScaling(scaling[0], scaling[1], scaling[2]);
+	shape->setLocalScaling(localScaling);
+
+	return CreateGameObject(shape, mass, color, initialPosition, initialRotation, glmesh);
 }

@@ -1,15 +1,13 @@
-//
-// Created by AICDG on 2017/8/9.
-//
-
 #include "GameObject.h"
 
-GameObject::GameObject(btCollisionShape* pShape, float mass, const btVector3 &color, const btVector3 &initialPosition, const btQuaternion &initialRotation) {
+GameObject::GameObject(btCollisionShape* pShape, float mass, const btVector3 &color, const btVector3 &initialPosition, const btQuaternion &initialRotation, GLInstanceGraphicsShape* glmesh) {
 	// store the shape for later usage
 	m_pShape = pShape;
 
 	// store the color
 	m_color = color;
+
+	m_glmesh = glmesh;
 
 	// create the initial transform
 	btTransform transform;

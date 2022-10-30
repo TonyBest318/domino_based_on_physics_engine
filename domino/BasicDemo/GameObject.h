@@ -7,11 +7,12 @@
 
 #include <btBulletDynamicsCommon.h>
 #include "OpenGLMotionState.h"
+#include "../OpenGLWindow/GLInstanceGraphicsShape.h"
 
 
 class GameObject {
 public:
-	GameObject(btCollisionShape* pShape, float mass, const btVector3 &color, const btVector3 &initialPosition = btVector3(0,0,0), const btQuaternion &initialRotation = btQuaternion(0,0,1,1));
+	GameObject(btCollisionShape* pShape, float mass, const btVector3 &color, const btVector3 &initialPosition = btVector3(0,0,0), const btQuaternion &initialRotation = btQuaternion(0,0,1,1), GLInstanceGraphicsShape* glmesh = nullptr);
 	~GameObject();
 
 	// accessors
@@ -27,11 +28,14 @@ public:
 
 	btVector3 GetColor() { return m_color; }
 
+	GLInstanceGraphicsShape* GetObjShape() { return m_glmesh; }
+
 protected:
 	btCollisionShape*  m_pShape;
 	btRigidBody*    m_pBody;
 	OpenGLMotionState*  m_pMotionState;
 	btVector3      m_color;
+	GLInstanceGraphicsShape* m_glmesh;
 };
 
 

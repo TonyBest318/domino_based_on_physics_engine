@@ -27,6 +27,9 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\Utils\b3ResourcePath.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicDemo.h">
@@ -42,6 +45,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="OpenGLMotionState.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Utils\b3BulletDefaultFileIO.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Utils\b3ResourcePath.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CommonInterfaces\CommonRigidBodyBase.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

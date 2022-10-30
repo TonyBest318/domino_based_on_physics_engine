@@ -1,7 +1,3 @@
-//
-// Created by AICDG on 2017/8/9.
-//
-
 #include "BasicDemo.h"
 
 void BasicDemo::InitializePhysics() {
@@ -29,12 +25,18 @@ void BasicDemo::ShutdownPhysics() {
 }
 
 void BasicDemo::CreateObjects() {
+
 	// create a ground plane
 	CreateGameObject(new btBoxShape(btVector3(1,50,50)), 0, btVector3(0.2f, 0.6f, 0.6f), btVector3(0.0f, 0.0f, 0.0f));
 
 	// create our original red box
-	CreateGameObject(new btBoxShape(btVector3(1,1,1)), 1.0, btVector3(1.0f, 0.2f, 0.2f), btVector3(0.0f, 10.0f, 0.0f));
+	CreateGameObject(new btBoxShape(btVector3(1, 1, 1)), 1.0, btVector3(1.0f, 0.2f, 0.2f), btVector3(0.0f, 10.0f, 0.0f), btQuaternion(2, 2, 2, 1));
 
 	// create a second box
-	CreateGameObject(new btBoxShape(btVector3(1,1,1)), 1.0, btVector3(0.0f, 0.2f, 0.8f), btVector3(1.25f, 20.0f, 0.0f));
+	CreateGameObject(new btBoxShape(btVector3(1, 1, 1)), 1.0, btVector3(0.0f, 0.2f, 0.8f), btVector3(1.25f, 20.0f, 0.0f), btQuaternion(2, 3, 4, 1));
+
+	// create an object from obj file
+	float scaling[4] = { 0.1, 0.1, 0.1, 1 };
+	CreateGameObjectWithObj("ZLO200.obj", scaling, 1.0, btVector3(0.2f, 0.2f, 0.2f), btVector3(1.25f, 40.0f, 0.0f), btQuaternion(0, 0, 1, 1));
+
 }

@@ -5,7 +5,9 @@
 #ifndef BULLETOPENGL_FREEGLUTCALLBACKS_H
 #define BULLETOPENGL_FREEGLUTCALLBACKS_H
 
+
 #include "BulletOpenGLApplication.h"
+
 
 // global pointer to our application object
 static BulletOpenGLApplication* g_pApp;
@@ -60,6 +62,7 @@ int glutmain(int argc, char **argv, int width, int height, const char* title, Bu
 	// perform custom initialization our of application
 	g_pApp->Initialize();
 
+
 	// give our static
 	glutKeyboardFunc(KeyboardCallback);
 	glutKeyboardUpFunc(KeyboardUpCallback);
@@ -70,7 +73,7 @@ int glutmain(int argc, char **argv, int width, int height, const char* title, Bu
 	glutMouseFunc(MouseCallback);
 	glutPassiveMotionFunc(MotionCallback);
 	glutMotionFunc(MotionCallback);
-	glutDisplayFunc(DisplayCallback );
+	glutDisplayFunc(DisplayCallback);
 
 	// perform one render before we launch the application
 	g_pApp->Idle();

@@ -7,6 +7,7 @@
 
 #include "BulletOpenGLApplication.h"
 #include <btBulletDynamicsCommon.h>
+#include "../CommonInterfaces/CommonRigidBodyBase.h"
 
 class BasicDemo : public BulletOpenGLApplication {
 public:

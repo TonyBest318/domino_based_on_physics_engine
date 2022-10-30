@@ -1,7 +1,3 @@
-//
-// Created by AICDG on 2017/8/9.
-//
-
 #ifndef BULLETOPENGL_BULLETOPENGLAPPLICATION_H
 #define BULLETOPENGL_BULLETOPENGLAPPLICATION_H
 
@@ -61,14 +57,21 @@ public:
 
 	// drawing functions
 	void DrawBox(const btVector3 &halfSize);
-	void DrawShape(btScalar* transform, const btCollisionShape* pShape, const btVector3 &color);
+	void DrawObj(GLInstanceGraphicsShape* glmesh);
+	void DrawShape(btScalar* transform, const btCollisionShape* pShape, const btVector3 &color, GLInstanceGraphicsShape* glmesh=nullptr);
 
 	// object functions
 	GameObject* CreateGameObject(btCollisionShape* pShape,
 			const float &mass,
 			const btVector3 &color = btVector3(1.0f,1.0f,1.0f),
 			const btVector3 &initialPosition = btVector3(0.0f,0.0f,0.0f),
-			const btQuaternion &initialRotation = btQuaternion(0,0,1,1));
+			const btQuaternion &initialRotation = btQuaternion(0,0,1,1),
+			GLInstanceGraphicsShape* glmesh = nullptr);
+	GameObject* CreateGameObjectWithObj(const char* fileName, float scaling[4],
+			const float& mass,
+			const btVector3& color = btVector3(1.0f, 1.0f, 1.0f),
+			const btVector3& initialPosition = btVector3(0.0f, 0.0f, 0.0f),
+			const btQuaternion& initialRotation = btQuaternion(0, 0, 1, 1));
 protected:
 	// camera control
 	btVector3 m_cameraPosition; // the camera's current position

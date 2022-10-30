@@ -133,12 +133,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Utils\b3ResourcePath.cpp" />
     <ClCompile Include="BasicDemo.cpp" />
     <ClCompile Include="BulletOpenGLApplication.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\CommonInterfaces\CommonRigidBodyBase.h" />
+    <ClInclude Include="..\Utils\b3BulletDefaultFileIO.h" />
+    <ClInclude Include="..\Utils\b3ResourcePath.h" />
     <ClInclude Include="BasicDemo.h" />
     <ClInclude Include="BulletOpenGLApplication.h" />
     <ClInclude Include="FreeGLUTCallbacks.h" />
